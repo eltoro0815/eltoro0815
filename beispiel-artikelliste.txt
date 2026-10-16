@@ -1,0 +1,47 @@
+# Beispiel-Artikelliste für Mindfactory Bulk Cart Add
+# 
+# Format: Artikelnummer oder Artikelnummer:Menge
+# Zeilen mit # werden ignoriert
+#
+# Beispiele:
+
+# Einfache Artikelnummer (Menge = 1)
+1234567
+
+# Mit Mengenangabe (2 Stück)
+9876543:2
+
+# Weitere Beispiele:
+1357924:5
+4567890
+2468135:3
+
+# Kommentare und Leerzeilen werden ignoriert
+
+# Ein realistisches Beispiel für einen Gaming-PC Build:
+# CPU - AMD Ryzen 7 7800X3D
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# Mainboard - ASUS ROG Strix B650-A
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# RAM - 32GB DDR5
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# Grafikkarte - RTX 4070
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# SSD - 1TB NVMe
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# Netzteil - 750W 80+ Gold
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# Gehäuse
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# CPU-Kühler
+# (Hier würdest du die echte Artikelnummer einfügen)
+
+# Lüfter - 3 Stück
+# (Hier würdest du die echte Artikelnummer einfügen):3

@@ -1,0 +1,19 @@
+# Editor und IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Temporäre Dateien
+tmp/
+temp/
+*.tmp
+
+# Persönliche Artikellisten (nicht committen)
+meine-artikel*.txt
+private-liste*.txt
