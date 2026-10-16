@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Mindfactory Bulk Cart Add
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
-// @description  Fügt mehrere Artikel per Artikelnummer gleichzeitig in den Mindfactory-Warenkorb
+// @version      2.0.0
+// @description  Fügt mehrere Artikel per GET-Parameter oder manueller Eingabe in den Mindfactory-Warenkorb
 // @author       You
 // @match        https://www.mindfactory.de/*
 // @grant        none
@@ -16,10 +16,11 @@
     const CONFIG = {
         buttonText: '📦 Bulk-Artikel hinzufügen',
         modalTitle: 'Artikel in Warenkorb legen',
-        addDelay: 1000, // Verzögerung zwischen Artikeln in ms
+        addDelay: 1000,
+        getParamName: 'articles', // GET-Parameter Name: ?articles=123,456,789
     };
 
-    // CSS Styles für das Modal
+    // CSS Styles
     const styles = `
         .mf-bulk-modal {
             display: none;
@@ -147,23 +148,40 @@
             margin-bottom: 10px;
             line-height: 1.5;
         }
+        .mf-bulk-url-info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .mf-bulk-url-info code {
+            background-color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
     `;
 
-    // Füge Styles hinzu
     const styleSheet = document.createElement("style");
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
 
-    // Erstelle Modal HTML
+    // Modal HTML
     const modalHTML = `
         <div id="mfBulkModal" class="mf-bulk-modal">
             <div class="mf-bulk-modal-content">
                 <span class="mf-bulk-close">&times;</span>
                 <h2>${CONFIG.modalTitle}</h2>
+                <div class="mf-bulk-url-info">
+                    <strong>💡 URL-Parameter:</strong><br>
+                    Du kannst Artikel direkt per URL hinzufügen:<br>
+                    <code>?articles=1234567,9876543:2,1357924:5</code>
+                </div>
                 <div class="mf-bulk-help">
-                    Gib die Artikelnummern ein (eine pro Zeile).<br>
-                    Format: <code>Artikelnummer</code> oder <code>Artikelnummer:Menge</code><br>
-                    Beispiel: <code>1234567</code> oder <code>1234567:2</code>
+                    <strong>Manuelle Eingabe:</strong> Artikelnummern (eine pro Zeile)<br>
+                    Format: <code>Artikelnummer</code> oder <code>Artikelnummer:Menge</code>
                 </div>
                 <textarea id="mfBulkInput" class="mf-bulk-textarea" placeholder="Beispiel:&#10;1234567&#10;9876543:2&#10;1357924:5"></textarea>
                 <div>
@@ -180,13 +198,12 @@
         </div>
     `;
 
-    // Erstelle Trigger Button
+    // Trigger Button
     const triggerButton = document.createElement('button');
     triggerButton.className = 'mf-bulk-trigger-btn';
     triggerButton.textContent = CONFIG.buttonText;
     triggerButton.id = 'mfBulkTriggerBtn';
 
-    // Füge alles zum DOM hinzu
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     document.body.appendChild(triggerButton);
 
@@ -199,6 +216,44 @@
     const progress = document.getElementById('mfBulkProgress');
     const progressFill = document.getElementById('mfBulkProgressFill');
     const log = document.getElementById('mfBulkLog');
+
+    // GET-Parameter auslesen und verarbeiten
+    function getArticlesFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const articlesParam = urlParams.get(CONFIG.getParamName);
+        
+        if (articlesParam) {
+            console.log('Artikel aus URL gefunden:', articlesParam);
+            return articlesParam;
+        }
+        return null;
+    }
+
+    // Artikel aus URL-Parameter automatisch verarbeiten
+    function autoProcessFromURL() {
+        const articlesParam = getArticlesFromURL();
+        
+        if (articlesParam) {
+            // Konvertiere Komma-separierte Liste zu Zeilenumbrüchen
+            const articleLines = articlesParam.split(',').join('\n');
+            input.value = articleLines;
+            
+            // Zeige Notification
+            addLogEntry('📥 Artikel aus URL-Parameter geladen', 'success');
+            
+            // Optional: Automatisch starten
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('autostart') === '1' || urlParams.get('auto') === 'true') {
+                console.log('Automatischer Start aktiviert');
+                setTimeout(() => {
+                    processArticles();
+                }, 500);
+            } else {
+                // Zeige Modal mit gefüllter Liste
+                modal.style.display = 'block';
+            }
+        }
+    }
 
     // Event Listeners
     triggerButton.addEventListener('click', () => {
@@ -230,14 +285,13 @@
     async function processArticles() {
         const text = input.value.trim();
         if (!text) {
-            alert('Bitte gib mindestens eine Artikelnummer ein.');
+            alert('Bitte gib mindestens eine Artikelnummer ein oder nutze den URL-Parameter.');
             return;
         }
 
         const lines = text.split('\n').filter(line => line.trim());
         const articles = [];
 
-        // Parse die Eingabe
         for (const line of lines) {
             const trimmed = line.trim();
             if (!trimmed) continue;
@@ -260,7 +314,6 @@
             return;
         }
 
-        // Zeige Progress
         progress.style.display = 'block';
         log.innerHTML = '';
         startBtn.disabled = true;
@@ -268,7 +321,6 @@
         let successCount = 0;
         let errorCount = 0;
 
-        // Verarbeite jeden Artikel
         for (let i = 0; i < articles.length; i++) {
             const { articleNumber, quantity } = articles[i];
             const percent = ((i + 1) / articles.length) * 100;
@@ -288,17 +340,14 @@
                 addLogEntry(`✗ Fehler bei Artikel ${articleNumber}: ${error.message}`, 'error');
             }
 
-            // Warte zwischen Requests
             if (i < articles.length - 1) {
                 await sleep(CONFIG.addDelay);
             }
         }
 
-        // Zeige Zusammenfassung
         addLogEntry(`\n=== Fertig: ${successCount} erfolgreich, ${errorCount} fehlgeschlagen ===`, 'success');
         startBtn.disabled = false;
 
-        // Aktualisiere Warenkorb-Anzeige
         setTimeout(() => {
             location.reload();
         }, 2000);
@@ -306,7 +355,6 @@
 
     // Artikel zum Warenkorb hinzufügen
     async function addToCart(articleNumber, quantity) {
-        // Methode 1: Versuche das Schnellbestellformular zu verwenden
         const quickOrderForm = document.querySelector('form[name="quickorder"]') || 
                                document.querySelector('form[action*="schnellbestellung"]') ||
                                document.querySelector('form[action*="quickorder"]');
@@ -325,7 +373,6 @@
                     quantityInput.value = quantity;
                 }
                 
-                // Submit das Formular
                 const submitBtn = quickOrderForm.querySelector('button[type="submit"]') ||
                                   quickOrderForm.querySelector('input[type="submit"]');
                 if (submitBtn) {
@@ -335,7 +382,6 @@
             }
         }
 
-        // Methode 2: Direkter API-Call (falls Formular nicht gefunden)
         try {
             const formData = new FormData();
             formData.append('artikel_id', articleNumber);
@@ -354,7 +400,6 @@
         }
     }
 
-    // Hilfsfunktionen
     function addLogEntry(message, type = '') {
         const entry = document.createElement('div');
         entry.className = `mf-bulk-log-item ${type ? 'mf-bulk-log-' + type : ''}`;
@@ -367,5 +412,9 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    console.log('Mindfactory Bulk Cart Add Script geladen!');
+    // Beim Laden: Prüfe URL-Parameter
+    autoProcessFromURL();
+
+    console.log('Mindfactory Bulk Cart Add Script v2.0 geladen!');
+    console.log('URL-Parameter:', `?${CONFIG.getParamName}=1234567,9876543:2,1357924:5`);
 })();

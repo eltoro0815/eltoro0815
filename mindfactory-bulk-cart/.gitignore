@@ -17,3 +17,22 @@ temp/
 # Persönliche Artikellisten (nicht committen)
 meine-artikel*.txt
 private-liste*.txt
+bestellung*.csv
+bestellung*.xlsx
+
+# QR-Codes
+*.png
+*.jpg
+!screenshot.png
+
+# Node modules (falls Node-Integration)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
