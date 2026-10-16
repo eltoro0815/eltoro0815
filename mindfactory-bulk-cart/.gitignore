@@ -1,0 +1,38 @@
+# Editor und IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Temporäre Dateien
+tmp/
+temp/
+*.tmp
+
+# Persönliche Artikellisten (nicht committen)
+meine-artikel*.txt
+private-liste*.txt
+bestellung*.csv
+bestellung*.xlsx
+
+# QR-Codes
+*.png
+*.jpg
+!screenshot.png
+
+# Node modules (falls Node-Integration)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/

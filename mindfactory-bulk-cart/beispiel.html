@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindfactory Bulk Cart - Beispiel Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .article-list {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .article-item {
+            display: grid;
+            grid-template-columns: 1fr 100px 60px;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .article-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        
+        .btn-add {
+            background: #ed8936;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .btn-add:hover {
+            background: #dd6b20;
+        }
+        
+        .url-output {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            word-break: break-all;
+        }
+        
+        .url-output strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .url-output code {
+            display: block;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #667eea;
+            overflow-x: auto;
+        }
+        
+        .checkbox-group {
+            margin: 15px 0;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .examples {
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .examples h3 {
+            color: #c53030;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .examples ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .examples li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .examples code {
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #c53030;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Mindfactory Bulk Cart Generator</h1>
+        <p class="subtitle">Erstelle einen Link zum automatischen Hinzufügen mehrerer Artikel</p>
+        
+        <div class="section">
+            <div class="section-title">Artikel hinzufügen</div>
+            <div class="article-list" id="articleList">
+                <!-- Artikel werden hier dynamisch eingefügt -->
+            </div>
+            <button class="btn btn-add" onclick="addArticle()">+ Artikel hinzufügen</button>
+        </div>
+        
+        <div class="section">
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="autostart" />
+                    Automatisch beim Laden in den Warenkorb legen
+                </label>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generateURL()">🔗 URL generieren</button>
+                <button class="btn btn-secondary" onclick="openMindfactory()">🚀 Bei Mindfactory öffnen</button>
+            </div>
+        </div>
+        
+        <div class="url-output" id="urlOutput" style="display:none;">
+            <strong>Generierte URL:</strong>
+            <code id="generatedURL"></code>
+        </div>
+        
+        <div class="examples">
+            <h3>💡 Tipps</h3>
+            <ul>
+                <li>📌 Artikelnummern findest du in der Produkt-URL oder auf der Produktseite</li>
+                <li>🔢 Die Menge gibt an, wie oft der Artikel in den Warenkorb gelegt wird</li>
+                <li>⚡ Mit "Autostart" werden die Artikel sofort hinzugefügt, ohne dass du klicken musst</li>
+                <li>🔖 Speichere die URL als Lesezeichen für wiederkehrende Bestellungen</li>
+                <li>📱 Generiere QR-Codes aus der URL für einfaches Smartphone-Shopping</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Initial 3 Artikel-Felder hinzufügen
+        for (let i = 0; i < 3; i++) {
+            addArticle();
+        }
+        
+        function addArticle() {
+            const list = document.getElementById('articleList');
+            const item = document.createElement('div');
+            item.className = 'article-item';
+            item.innerHTML = `
+                <input type="text" placeholder="Artikelnummer (z.B. 1234567)" class="article-number" />
+                <input type="number" value="1" min="1" placeholder="Menge" class="article-quantity" />
+                <button class="btn btn-add" onclick="removeArticle(this)" style="background: #e53e3e;">✕</button>
+            `;
+            list.appendChild(item);
+        }
+        
+        function removeArticle(btn) {
+            btn.parentElement.remove();
+        }
+        
+        function getArticles() {
+            const articles = [];
+            const items = document.querySelectorAll('.article-item');
+            
+            items.forEach(item => {
+                const number = item.querySelector('.article-number').value.trim();
+                const quantity = item.querySelector('.article-quantity').value;
+                
+                if (number) {
+                    articles.push({
+                        number: number,
+                        quantity: parseInt(quantity) || 1
+                    });
+                }
+            });
+            
+            return articles;
+        }
+        
+        function generateURL() {
+            const articles = getArticles();
+            
+            if (articles.length === 0) {
+                alert('Bitte gib mindestens eine Artikelnummer ein!');
+                return null;
+            }
+            
+            // Format: artikelnummer:menge,artikelnummer:menge
+            const articlesParam = articles
+                .map(a => a.quantity > 1 ? `${a.number}:${a.quantity}` : a.number)
+                .join(',');
+            
+            const autostart = document.getElementById('autostart').checked;
+            const autostartParam = autostart ? '&autostart=1' : '';
+            
+            const url = `https://www.mindfactory.de/?articles=${articlesParam}${autostartParam}`;
+            
+            // URL anzeigen
+            document.getElementById('generatedURL').textContent = url;
+            document.getElementById('urlOutput').style.display = 'block';
+            
+            // URL in Zwischenablage kopieren
+            navigator.clipboard.writeText(url).then(() => {
+                console.log('URL in Zwischenablage kopiert!');
+            });
+            
+            return url;
+        }
+        
+        function openMindfactory() {
+            const url = generateURL();
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+        
+        // Enter-Taste zum Generieren
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateURL();
+            }
+        });
+    </script>
+</body>
+</html>
